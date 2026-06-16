@@ -6,7 +6,6 @@ from PyQt6.QtGui import QImage, QPixmap, QFont
 from PyQt6.QtCore import QThread, pyqtSignal, Qt
 from .overlay import OverlayWidget
 
-# کلاس VisionThread بدون تغییر از قبل باقی می‌ماند
 class VisionThread(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
     update_overlay_signal = pyqtSignal(list, set)
@@ -46,7 +45,7 @@ class VisionThread(QThread):
 class MainWindow(QMainWindow):
     def __init__(self, vision_handler, tracker, mapper, midi_out):
         super().__init__()
-        self.mapper = mapper  # ذخیره ارجاع به موتور ریاضی برای تغییر حالت
+        self.mapper = mapper 
         self.setWindowTitle("AeroChord - Live Performance")
         self.resize(1000, 700)
         self.setStyleSheet("background-color: #000000;")
@@ -54,12 +53,10 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         
-        # چیدمان عمودی: ویدیو در بالا، نوار ابزار در پایین
         main_layout = QVBoxLayout(central_widget)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
-        # ---------------- 1. محیط ویدیو و لایه‌ها ----------------
         self.video_container = QWidget()
         video_layout = QVBoxLayout(self.video_container)
         video_layout.setContentsMargins(0, 0, 0, 0)
@@ -71,7 +68,6 @@ class MainWindow(QMainWindow):
         self.overlay = OverlayWidget(self.video_container)
         main_layout.addWidget(self.video_container, stretch=1)
 
-        # ---------------- 2. نوار ابزار پایین (Bottom Bar) ----------------
         bottom_bar = QFrame()
         bottom_bar.setFixedHeight(60)
         bottom_bar.setStyleSheet("""
@@ -90,12 +86,10 @@ class MainWindow(QMainWindow):
         toolbar_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         toolbar_layout.setSpacing(15)
 
-        # المان‌های نوار ابزار
         toolbar_layout.addWidget(QLabel("Mode:"))
         
         self.mode_combo = QComboBox()
         self.mode_combo.addItems(["Two-hand Chord", "Drum Pad (4x4)"])
-        # اتصال تغییرات منو به تابع تغییر چیدمان
         self.mode_combo.currentTextChanged.connect(self.change_layout_mode)
         toolbar_layout.addWidget(self.mode_combo)
 
@@ -120,14 +114,12 @@ class MainWindow(QMainWindow):
 
         main_layout.addWidget(bottom_bar)
 
-        # راه‌اندازی Thread پردازش تصویر
         self.thread = VisionThread(vision_handler, tracker, mapper, midi_out)
         self.thread.change_pixmap_signal.connect(self.update_image)
         self.thread.update_overlay_signal.connect(self.overlay.update_zones)
         self.thread.start()
 
     def change_layout_mode(self, mode_name):
-        """تغییر لحظه‌ای مناطق تشخیص با توجه به انتخاب کاربر"""
         if mode_name == "Two-hand Chord":
             self.mapper.load_radial_layout()
         elif mode_name == "Drum Pad (4x4)":

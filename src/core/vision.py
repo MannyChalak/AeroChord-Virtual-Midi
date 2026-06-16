@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from typing import Tuple, Optional
 
-# Configure logger for tracking events and errors
+
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(name)s - %(message)s')
 logger = logging.getLogger("Vision")
 
@@ -35,7 +35,6 @@ class WebcamHandler:
             logger.warning("Failed to grab frame from webcam. Camera might be disconnected.")
             return False, None
             
-        # Flip frame horizontally for a mirror effect (intuitive for users interacting with the screen)
         frame = cv2.flip(frame, 1)
         return True, frame
 

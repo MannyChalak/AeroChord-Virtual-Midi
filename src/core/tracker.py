@@ -19,10 +19,8 @@ class HandTracker:
         """
         self.model_path = model_path
         
-        # 1. Setup Base Options with the downloaded model
         base_options = python.BaseOptions(model_asset_path=self.model_path)
         
-        # 2. Configure Hand Landmarker Options for Video Stream
         options = vision.HandLandmarkerOptions(
             base_options=base_options,
             running_mode=vision.RunningMode.VIDEO, # Optimized for consecutive frames
@@ -32,7 +30,6 @@ class HandTracker:
             min_tracking_confidence=0.5
         )
         
-        # 3. Create the detector
         try:
             self.detector = vision.HandLandmarker.create_from_options(options)
             logger.info("Modern MediaPipe Tasks HandTracker initialized successfully.")
@@ -44,23 +41,18 @@ class HandTracker:
         """
         Process the frame and extract raw X, Y, Z coordinates.
         """
-        # MediaPipe requires RGB format
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
-        # Convert numpy array to MediaPipe Image object
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
         
-        # Video mode requires a monotonically increasing timestamp in milliseconds
         timestamp_ms = int(time.time() * 1000)
         
-        # Perform detection
         detection_result = self.detector.detect_for_video(mp_image, timestamp_ms)
         
         hands_landmarks: List[List[Tuple[float, float, float]]] = []
         
         if detection_result.hand_landmarks:
             for hand_landmarks in detection_result.hand_landmarks:
-                # Extract X, Y, Z for each of the 21 landmarks
                 landmarks_list = [(lm.x, lm.y, lm.z) for lm in hand_landmarks]
                 hands_landmarks.append(landmarks_list)
                 
