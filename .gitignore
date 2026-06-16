@@ -1,1 +1,25 @@
-"venv/" 
+# فایل قبلی رو پاک کن
+rm .gitignore
+
+# یک فایل جدید با تمام استثناهای مهم بساز
+cat > .gitignore <<EOL
+# ماشین مجازی پایتون
+venv/
+env/
+ENV/
+.venv
+
+# فایل‌های کامپایل شده پایتون
+__pycache__/
+*.pyc
+*.pyo
+
+# فایل‌های سیستمی
+.DS_Store
+Thumbs.db
+
+# محیط‌های توسعه
+.idea/
+.vscode/
+*.swp
+EOL
